@@ -1,54 +1,66 @@
-const Part = (props) => (
-  <p>
-    {props.part} {props.exercises}
-  </p>
+import { useState } from "react";
+
+const Button = ({ handleClick, text }) => (
+  <button onClick={handleClick}>{text}</button>
 );
 
-const Header = ({ course }) => <h1>{course}</h1>;
-
-const Content = (props) => {
+const StatiticsLine = ({ text, value, porcent, fixed }) => {
   return (
-    <div>
-      <Part part={props.parts[0].name} exercises={props.parts[0].exercises} />
-      <Part part={props.parts[1].name} exercises={props.parts[1].exercises} />
-      <Part part={props.parts[2].name} exercises={props.parts[2].exercises} />
-    </div>
+    <>
+      <tr>
+        <td>{text}</td>
+        <td>{fixed ? Number.parseFloat(value).toFixed(1) : value} {porcent ? '%' : ''}</td>
+      </tr>
+    </>
   );
 };
 
-const Total = (props) => (
-  <p>
-    Number of exercises{" "}
-    {props.parts[0].exercises +
-      props.parts[1].exercises +
-      props.parts[2].exercises}
-  </p>
-);
-
 const App = () => {
-  const course = {
-    name: "Half Stack application development",
-    parts: [
-      {
-        name: "Fundamentals of React",
-        exercises: 10,
-      },
-      {
-        name: "Using props to pass data",
-        exercises: 7,
-      },
-      {
-        name: "State of a component",
-        exercises: 14,
-      },
-    ],
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [score, setScore] = useState(0);
+
+  const clickGood = () => {
+    setGood(good + 1);
+    setTotal(total + 1);
+    setScore(score + 1);
+  };
+
+  const clickNeutral = () => {
+    setNeutral(neutral + 1);
+    setTotal(total + 1);
+  };
+  const clickBad = () => {
+    setBad(bad + 1);
+    setTotal(total + 1);
+    setScore(score - 1);
   };
 
   return (
     <div>
-      <Header course={course.name} />
-      <Content parts={course.parts} />
-      <Total parts={course.parts} />
+      <h1>Give feedback</h1>
+      <Button handleClick={clickGood} text={"good"} />
+      <Button handleClick={clickNeutral} text={"neutral"} />
+      <Button handleClick={clickBad} text={"bad"} />
+      <h1>Statitics</h1>
+      {total === 0 ? (
+        "No feedback given"
+      ) : (
+        <>
+          <table>
+            <tbody>
+              <StatiticsLine text="good" value={good} fixed={false} />
+              <StatiticsLine text="neutral" value={neutral} fixed={false} />
+              <StatiticsLine text="bad" value={bad} fixed={false} />
+              <StatiticsLine text="total" value={total} fixed={false} />
+              <StatiticsLine text="average" value={score / total} />
+              <StatiticsLine text="positive" value={(good * 100) / total} porcent={true} />
+            </tbody>
+          </table>
+        </>
+      )}
     </div>
   );
 };
